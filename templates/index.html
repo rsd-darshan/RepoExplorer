@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Repository Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-EvZfki+F+7BC+ms3koCkqgV6t4Kk/5Yi45t7RQBe9L0iCNGXkHoFu2MIbw5PqIhzPvA0SLkFFu+5QG7oX2I65A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar left">
+            <a href="#" id="new-chat">
+                <h1>AI Agents - Here To Help!</h1>
+            </a>
+            <input type="text" placeholder="Explore" class="explore-input">
+            <ul class="menu">
+                <li id="now-chat">New Chat</li>
+                <li>Clone Other Projects</li>
+                <li>Agents</li>
+                <li>ChatBot</li>
+                <li>Official Website</li>
+                <li>PC Software</li>
+                <li>About Us</li>
+                <li>Team</li>
+                <li>Buy Premium</li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <h1>GitHub Repository Search</h1>
+            <div class="search-form">
+                <form method="post">
+                    <label for="user_input">Prompt:</label>
+                    <input type="text" id="user_input" name="user_input" placeholder="Enter your query" required>
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+        <div class="sidebar right">
+            <h3>Filters</h3>
+            <form class="filter-form">
+                <label for="language">Programming Language (optional):</label>
+                <input type="text" id="language" name="language" placeholder="Enter language">
+                <label for="sort_by">Sort by:</label>
+                <select id="sort_by" name="sort_by">
+                    <option value="best_match">Best Match</option>
+                    <option value="stars">Stars</option>
+                    <option value="forks">Forks</option>
+                    <option value="updated">Recently Updated</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

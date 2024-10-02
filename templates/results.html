@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Repository Search Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-EvZfki+F+7BC+ms3koCkqgV6t4Kk/5Yi45t7RQBe9L0iCNGXkHoFu2MIbw5PqIhzPvA0SLkFFu+5QG7oX2I65A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar left">
+            <a href="#" id="new-chat">
+                <h1>AI Agents - Here To Help!</h1>
+            </a>
+            <input type="text" placeholder="Explore" class="explore-input">
+            <ul class="menu">
+                <li id="now-chat">New Chat</li>
+                <li>Clone Other Projects</li>
+                <li>Agents</li>
+                <li>ChatBot</li>
+                <li>Official Website</li>
+                <li>PC Software</li>
+                <li>About Us</li>
+                <li>Team</li>
+                <li>Buy Premium</li>
+            </ul>
+        </div>
+        <div class="main-content">
+            <h1>GitHub Repository Search Results</h1>
+            <p><strong>Search Query:</strong> {{ query }}</p>
+            <p><strong>Programming Language:</strong> {{ language }}</p>
+            <p><strong>Sort by:</strong> {{ sort_by }}</p>
+
+            {% if error %}
+                <div class="error">Error: {{ error }}</div>
+            {% endif %}
+
+            <div id="repositories" class="skeleton-container">
+                <!-- Skeletons representing loading repository cards -->
+                <div class="skeleton skeleton-repo">
+                    <div class="skeleton skeleton-header"></div>
+                    <div class="skeleton skeleton-description"></div>
+                    <div class="skeleton skeleton-tags"></div>
+                    <div class="skeleton skeleton-details"></div>
+                </div>
+                <div class="skeleton skeleton-repo">
+                    <div class="skeleton skeleton-header"></div>
+                    <div class="skeleton skeleton-description"></div>
+                    <div class="skeleton skeleton-tags"></div>
+                    <div class="skeleton skeleton-details"></div>
+                </div>
+                <div class="skeleton skeleton-repo">
+                    <div class="skeleton skeleton-header"></div>
+                    <div class="skeleton skeleton-description"></div>
+                    <div class="skeleton skeleton-tags"></div>
+                    <div class="skeleton skeleton-details"></div>
+                </div>
+            </div>
+
+            <div id="repositories-content" style="display: none;">
+                {% for repo in repositories %}
+                    <div class="repository">
+                        <div class="repo-header">
+                            <h3><a href="{{ repo.html_url }}" target="_blank">{{ repo.name }}</a></h3>
+                            <p class="owner">
+                                <img src="{{ repo.owner.avatar_url }}" alt="Owner Avatar" class="owner-avatar">
+                                <a href="{{ repo.owner.html_url }}" target="_blank">{{ repo.owner.login }}</a>
+                            </p>
+                        </div>
+                        <div class="description-container">
+                            <p class="description {{ 'collapsed' if repo.description and repo.description|length > 200 else '' }}">{{ repo.description or "No description available." }}</p>
+                            {% if repo.description and repo.description|length > 200 %}
+                                <button class="read-more-btn" onclick="toggleDescription(this)">Read More</button>
+                            {% endif %}
+                        </div>
+                        <p class="tags">
+                            {% if repo.language %}
+                                <span class="tag language">{{ repo.language }}</span>
+                            {% endif %}
+                            {% for topic in repo.topics %}
+                                <span class="tag">{{ topic }}</span>
+                            {% endfor %}
+                        </p>
+                        <p class="details">
+                            <span><i class="fas fa-star"></i> {{ repo.stargazers_count }}</span>
+                            <span><i class="fas fa-code-branch"></i> {{ repo.forks_count }}</span>
+                            <span><i class="fas fa-exclamation-circle"></i> {{ repo.open_issues_count }} issues</span>
+                            {% if repo.license %}
+                                <span><i class="fas fa-balance-scale"></i> {{ repo.license.name }}</span>
+                            {% endif %}
+                            <span><i class="fas fa-clock"></i> Updated: {{ repo.updated_at }}</span>
+                        </p>
+                        <div class="links">
+                            <a href="{{ repo.html_url }}" target="_blank" title="Visit Repository">
+                                <i class="fas fa-link"></i>
+                            </a>
+                            <a href="{{ repo.html_url }}/archive/master.zip" target="_blank" title="Download ZIP">
+                                <i class="fas fa-file-archive"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="pagination">
+                {% if prev_page %}
+                    <a href="{{ url_for('results', query=query, language=language, sort_by=sort_by, page=1) }}">&laquo; First</a>
+                    <a href="{{ url_for('results', query=query, language=language, sort_by=sort_by, page=prev_page) }}">&lsaquo; Previous</a>
+                {% endif %}
+                <span>Page {{ current_page }} of {{ last_page }}</span>
+                {% if next_page %}
+                    <a href="{{ url_for('results', query=query, language=language, sort_by=sort_by, page=next_page) }}">Next &rsaquo;</a>
+                    <a href="{{ url_for('results', query=query, language=language, sort_by=sort_by, page=last_page) }}">Last &raquo;</a>
+                {% endif %}
+            </div>
+            <div class="search-form">
+                <form method="post">
+                    <label for="user_input">Description:</label>
+                    <input type="text" id="user_input" name="user_input" placeholder="Enter code description" required>
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+        <div class="sidebar right">
+            <h3>Filters</h3>
+            <form class="filter-form">
+                <label for="language">Programming Language (optional):</label>
+                <input type="text" id="language" name="language" placeholder="Enter language">
+                <label for="sort_by">Sort by:</label>
+                <select id="sort_by" name="sort_by">
+                    <option value="best_match">Best Match</option>
+                    <option value="stars">Stars</option>
+                    <option value="forks">Forks</option>
+                    <option value="updated">Recently Updated</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
